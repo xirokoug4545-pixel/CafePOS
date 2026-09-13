@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('products', function (Blueprint $table) {
+            if (! Schema::hasColumn('products', 'is_seasonal')) {
+                $table->boolean('is_seasonal')->default(false)->after('price');
+            }
+            if (! Schema::hasColumn('products', 'tracks_inventory')) {
+                $table->boolean('tracks_inventory')->default(false)->after('is_seasonal');
+            }
+            if (! Schema::hasColumn('products', 'stock_quantity')) {
+                $table->unsignedInteger('stock_quantity')->default(0)->after('tracks_inventory');
+            }
+            if (! Schema::hasColumn('products', 'low_stock_threshold')) {
+                $table->unsignedInteger('low_stock_threshold')->default(5)->after('stock_quantity');
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn(['tracks_inventory', 'stock_quantity', 'low_stock_threshold']);
+        });
+    }
+};
